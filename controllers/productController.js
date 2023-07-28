@@ -1,4 +1,6 @@
 const Product = require("../models/Product");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 module.exports = {
   createProduct: async (req, res) => {
@@ -60,7 +62,10 @@ module.exports = {
         return res.status(400).json({ message: "No image URL provided" });
       }
 
-      const userId = req.user._id;
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+      req.userData = { userId: decodedToken.userId };
+      const userId = req.userData.userId;
 
       await User.findByIdAndUpdate(userId, { imageUrl });
 
