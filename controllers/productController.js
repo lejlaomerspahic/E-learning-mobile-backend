@@ -52,4 +52,22 @@ module.exports = {
       res.status(500).json("Failed to search product");
     }
   },
+
+  upload: async (req, res) => {
+    try {
+      const { imageUrl } = req.body;
+      if (!imageUrl) {
+        return res.status(400).json({ message: "No image URL provided" });
+      }
+
+      const userId = req.user._id;
+
+      await User.findByIdAndUpdate(userId, { imageUrl });
+
+      return res.status(200).json({ message: "Image URL saved successfully" });
+    } catch (error) {
+      console.error("Error saving image URL:", error.message);
+      return res.status(500).json({ message: "Server error" });
+    }
+  },
 };

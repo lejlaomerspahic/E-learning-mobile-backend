@@ -7,7 +7,7 @@ const AuthTokenReq = (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized access." });
     }
 
-    const decodedToken = jwt.verify(token, "yourSecretKey");
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
     req.userData = { userId: decodedToken.userId };
     next();
   } catch (error) {

@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 router.post("/signin", async (req, res) => {
+  //login
   const { email, password } = req.body;
 
   try {
@@ -21,7 +22,7 @@ router.post("/signin", async (req, res) => {
       return res.status(401).json({ message: "User does not exist." });
     }
 
-    const token = jwt.sign({ userId: user._id }, "yourSecretKey", {
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
 
@@ -33,6 +34,7 @@ router.post("/signin", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
+  //registracija
   const { name, email, password } = req.body;
 
   try {
