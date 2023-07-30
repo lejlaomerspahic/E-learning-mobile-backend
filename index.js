@@ -2,9 +2,14 @@ const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const app = express();
-const productRouter = require("./routes/product");
 
 const authRouter = require("./routes/AuthRoutes");
+const quizRouter = require("./routes/quiz");
+const courseRouter = require("./routes/course");
+const instructorRouter = require("./routes/instructor");
+const productRouter = require("./routes/product");
+const userRouter = require("./routes/user");
+
 const port = 3000;
 
 dotenv.config();
@@ -17,6 +22,11 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.use("/api/products", productRouter);
+app.use("/api/quiz", quizRouter);
+app.use("/api/course", courseRouter);
+app.use("/api/instructor", instructorRouter);
+app.use("/api/user", userRouter);
+
 app.use("/user", authRouter);
 
 app.listen(process.env.PORT || port, () =>

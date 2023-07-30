@@ -15,10 +15,22 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  location: {
+    type: String,
+    required: true,
+  },
   imageUrl: {
     type: String,
     required: false,
   },
+  products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+  courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
+  scores: [
+    {
+      quizId: { type: Schema.Types.ObjectId, ref: "Quiz", required: true },
+      score: { type: Number, required: true },
+    },
+  ],
 });
 
 const User = mongoose.model("User", userSchema);
