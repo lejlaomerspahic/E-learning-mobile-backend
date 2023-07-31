@@ -48,4 +48,39 @@ module.exports = {
       return res.status(500).json({ message: "Server error" });
     }
   },
+
+  updateScores: async (req, res) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+      req.userData = { userId: decodedToken.userId };
+      const userId = req.userData.userId;
+      const { quizId, score } = req.body;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const quizScoreIndex = user.scores.findIndex(
+        (item) => item.quizId.toString() === quizId
+      );
+
+      if (quizScoreIndex !== -1) {
+        user.scores[quizScoreIndex].score = score;
+      } else {
+        user.scores.push({ quizId, score });
+      }
+
+      const updatedUser = await user.save();
+
+      res
+        .status(200)
+        .json({ message: "User data updated successfully", user: updatedUser });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Failed to update user data" });
+    }
+  },
 };

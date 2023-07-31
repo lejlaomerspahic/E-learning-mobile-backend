@@ -14,6 +14,7 @@ const instructorSchema = new Schema({
     phone: { type: String },
     website: { type: String },
   },
+  imageUrl: { type: String },
 });
 
 const Instructor = mongoose.model("Instructor", instructorSchema);

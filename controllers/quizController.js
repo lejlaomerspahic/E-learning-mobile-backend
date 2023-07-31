@@ -27,4 +27,19 @@ module.exports = {
       res.status(500).json("Failed to find quiz");
     }
   },
+  getQuiz: async (req, res) => {
+    try {
+      const quizId = req.params.id;
+      const quiz = await Quiz.findById(quizId);
+
+      if (!quiz) {
+        return res.status(404).json("Quiz not found");
+      }
+
+      res.status(200).json(quiz);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json("Failed to get quiz");
+    }
+  },
 };
