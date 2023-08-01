@@ -35,7 +35,7 @@ router.post("/signin", async (req, res) => {
 
 router.post("/signup", async (req, res) => {
   //registracija
-  const { name, email, password } = req.body;
+  const { name, email, password, location } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -50,6 +50,7 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      location,
     });
 
     await user.save();
