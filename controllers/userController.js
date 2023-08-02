@@ -1,18 +1,26 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 module.exports = {
   updateUser: async (req, res) => {
-    const updatedData = req.body;
-
+    let { name, email, password, location } = req.body;
     try {
       const token = req.headers.authorization.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
       req.userData = { userId: decodedToken.userId };
       const userId = req.userData.userId;
+      const user = await User.findById(userId);
+      if (password !== user.password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        password = hashedPassword;
+      }
 
-      const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
-        new: true,
+      const updatedUser = await User.findByIdAndUpdate(userId, {
+        name,
+        email,
+        password,
+        location,
       });
 
       if (!updatedUser) {

@@ -24,7 +24,6 @@ const userSchema = new Schema({
     required: false,
   },
   products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
-  courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
   scores: [
     {
       quizId: { type: Schema.Types.ObjectId, ref: "Quiz", required: true },
