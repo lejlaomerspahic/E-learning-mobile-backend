@@ -92,4 +92,20 @@ module.exports = {
       res.status(500).json({ error: "Failed to update user data" });
     }
   },
+
+  getUser: async (req, res) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+      req.userData = { userId: decodedToken.userId };
+      const userId = req.userData.userId;
+
+      const user = await User.findById(userId);
+
+      res.status(200).json({ message: "User: ", user });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Failed to get user" });
+    }
+  },
 };

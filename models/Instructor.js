@@ -15,6 +15,7 @@ const instructorSchema = new Schema({
     website: { type: String },
   },
   imageUrl: { type: String },
+  courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 });
 
 const Instructor = mongoose.model("Instructor", instructorSchema);

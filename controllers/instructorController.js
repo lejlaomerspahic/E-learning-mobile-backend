@@ -16,7 +16,9 @@ module.exports = {
   },
   getInstructor: async (req, res) => {
     try {
-      const instructor = await Instructor.findById(req.params.id);
+      const instructor = await Instructor.findById(req.params.id).populate(
+        "courses"
+      );
       res.status(200).json(instructor);
     } catch (error) {
       console.log(error);
