@@ -100,7 +100,12 @@ module.exports = {
       req.userData = { userId: decodedToken.userId };
       const userId = req.userData.userId;
 
-      const user = await User.findById(userId);
+      const user = await User.findById(userId).populate({
+        path: "scores",
+        populate: {
+          path: "quizId",
+        },
+      });
 
       res.status(200).json({ message: "User: ", user });
     } catch (error) {
