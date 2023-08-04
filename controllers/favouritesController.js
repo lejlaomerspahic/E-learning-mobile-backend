@@ -114,4 +114,28 @@ module.exports = {
       return res.status(500).json({ error: "Failed to check favorite" });
     }
   },
+
+  getAllFavorites: async (req, res) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+      req.userData = { userId: decodedToken.userId };
+      const userId = req.userData.userId;
+
+      const favorite = await Favourites.findOne({ user: userId })
+        .populate("courses")
+        .populate("products");
+
+      if (!favorite) {
+        return res
+          .status(404)
+          .json({ error: "Favorites not found for this user" });
+      }
+
+      return res.status(200).json(favorite);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Failed to get favorites" });
+    }
+  },
 };
