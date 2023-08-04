@@ -123,7 +123,12 @@ module.exports = {
       const userId = req.userData.userId;
 
       const favorite = await Favourites.findOne({ user: userId })
-        .populate("courses")
+        .populate({
+          path: "courses",
+          populate: {
+            path: "instructors",
+          },
+        })
         .populate("products");
 
       if (!favorite) {
