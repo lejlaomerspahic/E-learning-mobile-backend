@@ -1,10 +1,10 @@
-const Favourites = require("../models/Favourites");
+const Favorites = require("../models/Favorites");
 const jwt = require("jsonwebtoken");
 const Product = require("../models/Product");
 const Course = require("../models/Course");
 
 module.exports = {
-  createFavourites: async (req, res) => {
+  createFavorites: async (req, res) => {
     try {
       const token = req.headers.authorization.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -19,27 +19,27 @@ module.exports = {
           .json({ error: "Missing id in the request body" });
       }
 
-      let favourite = await Favourites.findOne({ user: userId });
+      let favorite = await Favorites.findOne({ user: userId });
 
-      if (!favourite) {
-        favourite = new Favourites({ user: userId, products: [], courses: [] });
+      if (!favorite) {
+        favorite = new Favorites({ user: userId, products: [], courses: [] });
       }
 
       const product = await Product.findById(id);
       if (product) {
-        if (!favourite.products.includes(id)) {
-          favourite.products.push(id);
+        if (!favorite.products.includes(id)) {
+          favorite.products.push(id);
         }
       } else {
         const course = await Course.findById(id);
         if (course) {
-          if (!favourite.courses.includes(id)) {
-            favourite.courses.push(id);
+          if (!favorite.courses.includes(id)) {
+            favorite.courses.push(id);
           }
         }
       }
 
-      await favourite.save();
+      await favorite.save();
 
       res.status(200).json({ message: "Fav created successfully" });
     } catch (error) {
@@ -48,7 +48,7 @@ module.exports = {
     }
   },
 
-  removeFromFavourites: async (req, res) => {
+  removeFromFavorites: async (req, res) => {
     try {
       const token = req.headers.authorization.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -63,25 +63,25 @@ module.exports = {
           .json({ error: "Missing id in the request body" });
       }
 
-      const favourite = await Favourites.findOne({ user: userId });
+      const favorite = await Favorites.findOne({ user: userId });
 
-      if (!favourite) {
+      if (!favorite) {
         return res
           .status(404)
-          .json({ error: "Favourites not found for the user" });
+          .json({ error: "Favorites not found for the user" });
       }
 
       const product = await Product.findById(id);
       if (product) {
-        favourite.products.remove(id);
+        favorite.products.remove(id);
       } else {
         const course = await Course.findById(id);
         if (course) {
-          favourite.courses.remove(id);
+          favorite.courses.remove(id);
         }
       }
 
-      await favourite.save();
+      await favorite.save();
 
       res.status(200).json({ message: "Fav removed successfully" });
     } catch (error) {
@@ -98,13 +98,13 @@ module.exports = {
 
       const { id } = req.params;
 
-      const favourite = await Favourites.findOne({ user: userId });
+      const favorite = await Favorites.findOne({ user: userId });
 
-      if (!favourite) {
+      if (!favorite) {
         return res.status(200).json({ isFavorite: false });
       }
 
-      if (favourite.products.includes(id) || favourite.courses.includes(id)) {
+      if (favorite.products.includes(id) || favorite.courses.includes(id)) {
         return res.status(200).json({ isFavorite: true });
       } else {
         return res.status(200).json({ isFavorite: false });
@@ -122,7 +122,7 @@ module.exports = {
       req.userData = { userId: decodedToken.userId };
       const userId = req.userData.userId;
 
-      const favorite = await Favourites.findOne({ user: userId })
+      const favorite = await Favorites.findOne({ user: userId })
         .populate({
           path: "courses",
           populate: {
@@ -141,6 +141,34 @@ module.exports = {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Failed to get favorites" });
+    }
+  },
+  personalization: async (req, res) => {
+    try {
+      const { favorites } = req.body;
+
+      const productTitle = favorites.products.map((item) => item.title);
+      const courseNames = favorites.courses.map((item) => item.name);
+
+      const products = await Product.find({
+        $or: [
+          { title: { $in: productTitle } },
+          { category: { $in: productTitle } },
+        ],
+      }).limit(5);
+
+      const courses = await Course.find({
+        $or: [
+          { name: { $in: courseNames } },
+          { category: { $in: courseNames } },
+        ],
+      }).limit(5);
+
+      const personalizedResults = [...products, ...courses];
+      res.json(personalizedResults);
+    } catch (error) {
+      console.error("error", error);
+      res.status(500).json({ message: "error" });
     }
   },
 };

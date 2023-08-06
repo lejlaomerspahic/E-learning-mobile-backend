@@ -9,7 +9,7 @@ const courseRouter = require("./routes/course");
 const instructorRouter = require("./routes/instructor");
 const productRouter = require("./routes/product");
 const userRouter = require("./routes/user");
-const favouritesRouter = require("./routes/favourites");
+const favoritesRouter = require("./routes/favorites");
 
 const port = 3000;
 
@@ -27,7 +27,7 @@ app.use("/api/quiz", quizRouter);
 app.use("/api/course", courseRouter);
 app.use("/api/instructor", instructorRouter);
 app.use("/api/user", userRouter);
-app.use("/api/favourites", favouritesRouter);
+app.use("/api/favorites", favoritesRouter);
 
 app.use("/user", authRouter);
 
