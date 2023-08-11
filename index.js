@@ -10,6 +10,7 @@ const instructorRouter = require("./routes/instructor");
 const productRouter = require("./routes/product");
 const userRouter = require("./routes/user");
 const favoritesRouter = require("./routes/favorites");
+const paymentRouter = require("./routes/payment");
 
 const port = 3000;
 
@@ -28,6 +29,7 @@ app.use("/api/course", courseRouter);
 app.use("/api/instructor", instructorRouter);
 app.use("/api/user", userRouter);
 app.use("/api/favorites", favoritesRouter);
+app.use("/api/stripe", paymentRouter);
 
 app.use("/user", authRouter);
 
