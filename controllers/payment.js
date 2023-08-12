@@ -7,7 +7,7 @@ module.exports = {
   payment: async (req, res) => {
     try {
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: 1000,
+        amount: req.body.price * 100,
         currency: "usd",
         payment_method_types: ["card"],
       });
