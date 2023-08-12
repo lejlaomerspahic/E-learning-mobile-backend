@@ -5,35 +5,19 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 module.exports = {
   payment: async (req, res) => {
-    const { token } = req.body;
     try {
-      // const paymentMethod = await stripe.paymentMethods.create({
-      //   type: "card",
-      //   card: req.body.card,
-      // });
-
-      console.log("token");
-      console.log(token);
-
-      const charge = await stripe.charges.create({
-        type: "card",
-        amount: 2000,
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 1000,
         currency: "usd",
-        source: token.id,
-        confirm: true,
+        payment_method_types: ["card"],
       });
 
-      // const paymentIntent = await stripe.paymentIntents.create({
-      //   amount: 2000,
-      //   currency: "usd",
-      //   payment_method: paymentMethod.id,
-      //   confirm: true,
-      //   source: token.id,
-      // });
-      res.status(200).json({ message: "Proslo" });
-      console.log("charge: ", charge);
+      const clientSecret = paymentIntent.client_secret;
+
+      res.status(200).json({ clientSecret });
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Error creating Payment Intent:", error);
+      throw error;
     }
   },
 };
