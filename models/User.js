@@ -23,7 +23,14 @@ const userSchema = new Schema({
     type: String,
     required: false,
   },
-  products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+  products: [
+    {
+      productsId: { type: Schema.Types.ObjectId, ref: "Product" },
+      date: { type: Date },
+      count: { type: Number },
+      price: { type: Number },
+    },
+  ],
   scores: [
     {
       quizId: { type: Schema.Types.ObjectId, ref: "Quiz", required: true },

@@ -100,12 +100,19 @@ module.exports = {
       req.userData = { userId: decodedToken.userId };
       const userId = req.userData.userId;
 
-      const user = await User.findById(userId).populate({
-        path: "scores",
-        populate: {
-          path: "quizId",
-        },
-      });
+      const user = await User.findById(userId)
+        .populate({
+          path: "scores",
+          populate: {
+            path: "quizId",
+          },
+        })
+        .populate({
+          path: "products",
+          populate: {
+            path: "productsId",
+          },
+        });
 
       res.status(200).json({ message: "User: ", user });
     } catch (error) {
@@ -120,21 +127,33 @@ module.exports = {
       req.userData = { userId: decodedToken.userId };
       const userId = req.userData.userId;
       const productIds = req.body.productIds;
+      const counts = req.body.counts;
+      const price = req.body.price;
+      const dateStr = req.body.date;
+      const date = new Date(dateStr);
 
       const user = await User.findById(userId);
+
+      const newProducts = productIds.map((productId, index) => ({
+        productsId: productId,
+        date: date.toISOString(),
+        count: counts[index],
+        price: price,
+      }));
+
+      console.log(newProducts);
+      user.products.push(...newProducts);
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      user.products.push(...productIds);
       await user.save();
 
       return res
         .status(200)
         .json({ message: "User data updated successfully", user });
     } catch (error) {
-      res.status(500).json({ message: "Failed to update user data" });
+      res.status(500).json({ message: "Failed to update user data", error });
     }
   },
 };
