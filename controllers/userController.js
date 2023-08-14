@@ -113,4 +113,28 @@ module.exports = {
       res.status(500).json({ error: "Failed to get user" });
     }
   },
+  updateUserProducts: async (req, res) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+      req.userData = { userId: decodedToken.userId };
+      const userId = req.userData.userId;
+      const productIds = req.body.productIds;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      user.products.push(...productIds);
+      await user.save();
+
+      return res
+        .status(200)
+        .json({ message: "User data updated successfully", user });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update user data" });
+    }
+  },
 };
