@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Schema = mongoose.Schema;
 const productSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -8,6 +8,12 @@ const productSchema = new mongoose.Schema(
     imageUrl: { type: String, required: true },
     description: { type: String, required: true },
     product_location: { type: String, required: true },
+    ratings: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        rating: { type: Number, required: true, min: 1, max: 5 },
+      },
+    ],
   },
   { timestamps: true }
 );
