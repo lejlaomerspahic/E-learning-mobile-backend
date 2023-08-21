@@ -12,6 +12,12 @@ const courseSchema = new Schema({
   lastUpdated: { type: String },
   language: { type: String },
   instructors: [{ type: Schema.Types.ObjectId, ref: "Instructor" }],
+  ratings: [
+    {
+      userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+      rating: { type: Number, required: true, min: 1, max: 5 },
+    },
+  ],
 });
 
 const Course = mongoose.model("Course", courseSchema);
