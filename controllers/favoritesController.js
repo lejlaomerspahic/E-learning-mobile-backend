@@ -150,28 +150,56 @@ module.exports = {
       const productTitle = favorites.products.map((item) => item.title);
       const courseNames = favorites.courses.map((item) => item.name);
 
-      const products = await Product.find({
-        $or: [
-          { title: { $in: productTitle } },
-          { category: { $in: productTitle } },
-        ],
-      }).limit(5);
+      let personalizedResults = [];
+      if (productTitle.length > 0) {
+        const allProductWords = productTitle.join(" ").split(" ");
 
-      const courses = await Course.find({
-        $or: [
-          { name: { $in: courseNames } },
-          { category: { $in: courseNames } },
-        ],
-      }).limit(5);
+        const filteredProductWords = allProductWords.filter(
+          (word) => word.length > 0
+        );
 
-      const personalizedResults = [...products, ...courses];
-      res.json(personalizedResults);
+        const coursesMatchingProductWords = await Product.find({
+          title: { $regex: filteredProductWords.join("|"), $options: "i" },
+        }).limit(5);
+
+        let coursesMatchingCourseWords = [];
+
+        if (courseNames.length > 0) {
+          const allCourseWords = courseNames.join(" ").split(" ");
+
+          const filteredCourseWords = allCourseWords.filter(
+            (word) => word.length > 0
+          );
+
+          coursesMatchingCourseWords = await Course.find({
+            name: { $regex: filteredCourseWords.join("|"), $options: "i" },
+          }).limit(5);
+        }
+
+        personalizedResults = [
+          ...coursesMatchingProductWords,
+          ...coursesMatchingCourseWords,
+        ];
+
+        console.log("personalizedResults");
+        console.log(personalizedResults);
+
+        res.json(personalizedResults);
+      } else {
+        const randomCourses = await Course.aggregate([
+          { $sample: { size: 3 } },
+        ]);
+
+        const randomProducts = await Product.aggregate([
+          { $sample: { size: 2 } },
+        ]);
+        personalizedResults = [...randomProducts, ...randomCourses];
+        res.json(personalizedResults);
+      }
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message: "An error occurred while fetching personalized results.",
-        });
+      res.status(500).json({
+        message: "An error occurred while fetching personalized results.",
+      });
     }
   },
 };
