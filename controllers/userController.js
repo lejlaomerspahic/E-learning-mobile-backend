@@ -108,45 +108,80 @@ module.exports = {
           },
         })
         .populate({
-          path: "products",
-          populate: {
-            path: "productsId",
-          },
+          path: "products.items.productId",
+          model: "Product",
         });
 
+      console.log("user.products");
+      console.log(user.products[0].items);
       res.status(200).json({ message: "User: ", user });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Failed to get user" });
     }
   },
+
   updateUserProducts: async (req, res) => {
     try {
       const token = req.headers.authorization.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-      req.userData = { userId: decodedToken.userId };
-      const userId = req.userData.userId;
-      const productIds = req.body.productIds;
-      const counts = req.body.counts;
-      const price = req.body.price;
-      const dateStr = req.body.date;
+      const userId = decodedToken.userId;
+
+      const {
+        productIds,
+        counts,
+        price,
+        status,
+        places,
+        date: dateStr,
+      } = req.body;
+
       const date = new Date(dateStr);
-
       const user = await User.findById(userId);
-
-      const newProducts = productIds.map((productId, index) => ({
-        productsId: productId,
-        date: date.toISOString(),
-        count: counts[index],
-        price: price,
-      }));
-
-      console.log(newProducts);
-      user.products.push(...newProducts);
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+
+      let uniqueName = "";
+      let areAllNamesEqual = false;
+
+      if (places[0] === places[places.length - 1]) {
+        uniqueName = places[0];
+        areAllNamesEqual = true;
+      }
+
+      if (areAllNamesEqual) {
+        const newProducts = productIds.map((productId, index) => ({
+          productId,
+          count: counts[index],
+        }));
+
+        const updatedProducts = {
+          items: newProducts,
+          date: date.toISOString(),
+          status: status,
+          price: price,
+          place: uniqueName,
+        };
+        user.products.push(updatedProducts);
+      } else {
+        const separateProducts = productIds.map((productId, index) => ({
+          productId,
+          count: counts[index],
+        }));
+
+        const separateGroup = separateProducts.map((item, index) => ({
+          items: [item],
+          date: date.toISOString(),
+          status: status,
+          price: price,
+          place: places[index],
+        }));
+
+        user.products.push(...separateGroup);
+      }
+
       await user.save();
 
       return res

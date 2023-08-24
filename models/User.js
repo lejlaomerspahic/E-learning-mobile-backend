@@ -25,10 +25,16 @@ const userSchema = new Schema({
   },
   products: [
     {
-      productsId: { type: Schema.Types.ObjectId, ref: "Product" },
-      date: { type: Date },
-      count: { type: Number },
+      items: [
+        {
+          productId: { type: Schema.Types.ObjectId, ref: "Product" },
+          count: { type: Number },
+        },
+      ],
+      date: { type: String },
+      status: { type: String },
       price: { type: Number },
+      place: { type: String },
     },
   ],
   scores: [
