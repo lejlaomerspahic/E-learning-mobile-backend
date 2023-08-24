@@ -112,8 +112,6 @@ module.exports = {
           model: "Product",
         });
 
-      console.log("user.products");
-      console.log(user.products[0].items);
       res.status(200).json({ message: "User: ", user });
     } catch (error) {
       console.log(error);
@@ -134,8 +132,11 @@ module.exports = {
         status,
         places,
         date: dateStr,
+        priceForDifferentLocation,
       } = req.body;
 
+      console.log("priceForDifferentLocation");
+      console.log(priceForDifferentLocation);
       const date = new Date(dateStr);
       const user = await User.findById(userId);
 
@@ -175,7 +176,7 @@ module.exports = {
           items: [item],
           date: date.toISOString(),
           status: status,
-          price: price,
+          price: priceForDifferentLocation[index],
           place: places[index],
         }));
 
