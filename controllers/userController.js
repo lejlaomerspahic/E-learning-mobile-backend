@@ -192,4 +192,37 @@ module.exports = {
       res.status(500).json({ message: "Failed to update user data", error });
     }
   },
+  updateStatus: async (req, res) => {
+    try {
+      const currentDate = new Date();
+      const twoDaysInMillis = 2 * 24 * 60 * 60 * 1000;
+      const newDate = new Date(currentDate.getTime() + twoDaysInMillis);
+
+      const products = await Product.find();
+
+      for (const product of products) {
+        const statusOptions = [
+          "Poslata",
+          "U tranzitu",
+          "Stigla u odredište",
+          "U procesu dostave",
+          "Isporučena",
+        ];
+        const currentStatusIndex = statusOptions.indexOf(product.status);
+
+        if (currentStatusIndex !== -1) {
+          const newStatusIndex =
+            (currentStatusIndex + 1) % statusOptions.length;
+          product.status = statusOptions[newStatusIndex];
+          product.date = newDate;
+
+          await product.save();
+        }
+      }
+
+      console.log("Statuses updated successfully");
+    } catch (error) {
+      console.error("Error updating statuses:", error);
+    }
+  },
 };
