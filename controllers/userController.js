@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const Product = require("../models/Product");
+const schedule = require("node-schedule");
 
 module.exports = {
   updateUser: async (req, res) => {
@@ -135,8 +137,6 @@ module.exports = {
         priceForDifferentLocation,
       } = req.body;
 
-      console.log("priceForDifferentLocation");
-      console.log(priceForDifferentLocation);
       const date = new Date(dateStr);
       const user = await User.findById(userId);
 
@@ -194,13 +194,16 @@ module.exports = {
   },
   updateStatus: async (req, res) => {
     try {
-      const currentDate = new Date();
-      const twoDaysInMillis = 2 * 24 * 60 * 60 * 1000;
-      const newDate = new Date(currentDate.getTime() + twoDaysInMillis);
-
       const products = await Product.find();
 
-      for (const product of products) {
+      products.forEach(async (product) => {
+        const currentDate = new Date();
+        const purchaseDate = new Date(product.date);
+        const twoDaysInMillis = 1 * 60 * 1000; //2 * 24 * 60 * 60 * 1000
+        const nextStatusUpdateDate = new Date(
+          purchaseDate.getTime() + twoDaysInMillis
+        );
+
         const statusOptions = [
           "Poslata",
           "U tranzitu",
@@ -208,21 +211,25 @@ module.exports = {
           "U procesu dostave",
           "Isporučena",
         ];
-        const currentStatusIndex = statusOptions.indexOf(product.status);
-
-        if (currentStatusIndex !== -1) {
+        if (currentDate >= nextStatusUpdateDate) {
+          const currentStatusIndex = statusOptions.indexOf(product.status);
           const newStatusIndex =
             (currentStatusIndex + 1) % statusOptions.length;
-          product.status = statusOptions[newStatusIndex];
-          product.date = newDate;
+          const newStatus = statusOptions[newStatusIndex];
 
-          await product.save();
+          await Product.findByIdAndUpdate(product._id, {
+            status: newStatus,
+          });
         }
-      }
+      });
 
-      console.log("Statuses updated successfully");
+      console.log("Status updated successfully");
     } catch (error) {
-      console.error("Error updating statuses:", error);
+      console.error("Error:", error);
     }
   },
 };
+const statusUpdateJob = schedule.scheduleJob(
+  "*/1 * * * *",
+  module.exports.updateStatus
+);
