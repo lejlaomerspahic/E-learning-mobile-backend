@@ -5,7 +5,6 @@ const User = require("../models/User");
 module.exports = {
   createProduct: async (req, res) => {
     const newProduct = new Product(req.body);
-    console.log("Request:", req.body);
     try {
       await newProduct.save();
       res.status(200).json("Product created successfully");

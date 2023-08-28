@@ -5,7 +5,6 @@ const Course = require("../models/Course");
 module.exports = {
   createCourse: async (req, res) => {
     const newCourse = new Course(req.body);
-    console.log("Request:", req.body);
     try {
       await newCourse.save();
       res.status(200).json("Course created successfully");

@@ -5,7 +5,6 @@ const User = require("../models/User");
 module.exports = {
   createInstructor: async (req, res) => {
     const newInstructor = new Instructor(req.body);
-    console.log("Request:", req.body);
     try {
       await newInstructor.save();
       res.status(200).json("Instructor created successfully");

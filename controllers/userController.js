@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Product = require("../models/Product");
 const schedule = require("node-schedule");
-
+let statusUpdateJob;
 module.exports = {
   updateUser: async (req, res) => {
     let { name, email, password, location } = req.body;
@@ -194,33 +194,38 @@ module.exports = {
   },
   updateStatus: async (req, res) => {
     try {
-      const products = await Product.find();
+      const users = await User.find();
+      users.forEach(async (user) => {
+        user.products.forEach(async (productEntry) => {
+          const currentDate = new Date();
+          const purchaseDate = new Date(productEntry.date);
+          const twoDaysInMillis = 10 * 1000; //2 * 24 * 60 * 60 * 1000
+          const nextStatusUpdateDate = new Date(
+            purchaseDate.getTime() + twoDaysInMillis
+          );
 
-      products.forEach(async (product) => {
-        const currentDate = new Date();
-        const purchaseDate = new Date(product.date);
-        const twoDaysInMillis = 1 * 60 * 1000; //2 * 24 * 60 * 60 * 1000
-        const nextStatusUpdateDate = new Date(
-          purchaseDate.getTime() + twoDaysInMillis
-        );
+          const statusOptions = [
+            "Narudžba primljena",
+            "Narudžba poslata",
+            "Narudžba u tranzitu",
+            "Narudžba stigla na odredište",
+            "Narudžba u procesu dostave",
+            "Narudžba isporučena",
+          ];
 
-        const statusOptions = [
-          "Poslata",
-          "U tranzitu",
-          "Stigla u odredište",
-          "U procesu dostave",
-          "Isporučena",
-        ];
-        if (currentDate >= nextStatusUpdateDate) {
-          const currentStatusIndex = statusOptions.indexOf(product.status);
-          const newStatusIndex =
-            (currentStatusIndex + 1) % statusOptions.length;
-          const newStatus = statusOptions[newStatusIndex];
+          if (currentDate >= nextStatusUpdateDate) {
+            const currentStatusIndex = statusOptions.indexOf(
+              productEntry.status
+            );
+            console.log(currentStatusIndex);
+            if (currentStatusIndex < statusOptions.length - 1) {
+              const newStatus = statusOptions[currentStatusIndex + 1];
+              productEntry.status = newStatus;
+            }
+          }
+        });
 
-          await Product.findByIdAndUpdate(product._id, {
-            status: newStatus,
-          });
-        }
+        await user.save();
       });
 
       console.log("Status updated successfully");
@@ -228,8 +233,46 @@ module.exports = {
       console.error("Error:", error);
     }
   },
+
+  func: async (req, res) => {
+    statusUpdateJob = schedule.scheduleJob("*/10 * * * * *", () => {
+      module.exports.updateStatus();
+    });
+    console.log("usao sam");
+  },
+  getStatus: async (req, res) => {
+    try {
+      const itemId = req.params.itemId;
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+      const userId = decodedToken.userId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "Korisnik nije pronađen" });
+      }
+
+      let itemStatus = null;
+
+      for (const product of user.products) {
+        if (product._id.toString() === itemId) {
+          itemStatus = product.status;
+          break;
+        }
+        if (itemStatus) {
+          break;
+        }
+      }
+
+      if (!itemStatus) {
+        return res.status(404).json({ message: "Stavka nije pronađena" });
+      }
+      console.log(itemStatus);
+      res.status(200).json({ status: itemStatus });
+    } catch (error) {
+      console.error("Greška pri dobijanju statusa narudžbe:", error);
+      res.status(500).json({ message: "Greška na serveru" });
+    }
+  },
 };
-const statusUpdateJob = schedule.scheduleJob(
-  "*/1 * * * *",
-  module.exports.updateStatus
-);

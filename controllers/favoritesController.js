@@ -181,9 +181,6 @@ module.exports = {
           ...coursesMatchingCourseWords,
         ];
 
-        console.log("personalizedResults");
-        console.log(personalizedResults);
-
         res.json(personalizedResults);
       } else {
         const randomCourses = await Course.aggregate([
