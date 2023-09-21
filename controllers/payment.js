@@ -1,8 +1,8 @@
 const stripe = require("stripe")(
   "sk_test_51Nc9U6CNsQ61mmLfaYnK4ms3WZNR0jMZUvzSnqcuXCb6vwYE8hdNMp3BSZQbYfc1G5rgRWvVe77QVaRVEb9BvyUh00P30maJ2g"
 );
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
 module.exports = {
   payment: async (req, res) => {
     try {

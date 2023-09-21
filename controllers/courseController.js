@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 const Course = require("../models/Course");
 
 module.exports = {
@@ -43,6 +42,7 @@ module.exports = {
       res.status(500).json("Failed to get course");
     }
   },
+
   rating: async (req, res) => {
     try {
       const courseId = req.params.courseId;
@@ -88,6 +88,7 @@ module.exports = {
       res.status(500).json({ message: "Failed to add rating" });
     }
   },
+
   checkRating: async (req, res) => {
     try {
       const courseId = req.params.courseId;

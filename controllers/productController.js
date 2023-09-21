@@ -99,6 +99,7 @@ module.exports = {
       res.status(500).json({ message: "Failed to add rating" });
     }
   },
+
   checkRating: async (req, res) => {
     try {
       const productId = req.params.productId;

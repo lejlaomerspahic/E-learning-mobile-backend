@@ -14,6 +14,7 @@ module.exports = {
       res.status(500).json({ error: "Failed to create the quiz" });
     }
   },
+
   searchQuiz: async (req, res) => {
     try {
       const searchTerm = req.params.key;
@@ -27,6 +28,7 @@ module.exports = {
       res.status(500).json("Failed to find quiz");
     }
   },
+
   getQuiz: async (req, res) => {
     try {
       const quizId = req.params.id;

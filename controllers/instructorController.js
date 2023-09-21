@@ -1,6 +1,4 @@
 const Instructor = require("../models/Instructor");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 
 module.exports = {
   createInstructor: async (req, res) => {
@@ -13,6 +11,7 @@ module.exports = {
       res.status(500).json({ error: "Failed to create the instructor" });
     }
   },
+
   getInstructor: async (req, res) => {
     try {
       const instructor = await Instructor.findById(req.params.id).populate(

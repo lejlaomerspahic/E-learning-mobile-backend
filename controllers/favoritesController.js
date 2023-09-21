@@ -89,6 +89,7 @@ module.exports = {
       return res.status(500).json({ error: "Failed to remove the fav" });
     }
   },
+
   check: async (req, res) => {
     try {
       const token = req.headers.authorization.split(" ")[1];
@@ -143,6 +144,7 @@ module.exports = {
       return res.status(500).json({ error: "Failed to get favorites" });
     }
   },
+
   personalization: async (req, res) => {
     try {
       const { favorites } = req.body;

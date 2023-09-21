@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
 const courseSchema = new Schema({
   name: { type: String, required: true },
   category: { type: String, required: true },
@@ -18,6 +19,7 @@ const courseSchema = new Schema({
       rating: { type: Number, required: true, min: 1, max: 5 },
     },
   ],
+  icon: { type: String },
 });
 
 const Course = mongoose.model("Course", courseSchema);

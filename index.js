@@ -30,7 +30,6 @@ app.use("/api/instructor", instructorRouter);
 app.use("/api/user", userRouter);
 app.use("/api/favorites", favoritesRouter);
 app.use("/api/stripe", paymentRouter);
-
 app.use("/user", authRouter);
 
 app.listen(process.env.PORT || port, () =>

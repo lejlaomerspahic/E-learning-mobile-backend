@@ -192,6 +192,7 @@ module.exports = {
       res.status(500).json({ message: "Failed to update user data", error });
     }
   },
+
   updateStatus: async (req, res) => {
     try {
       const users = await User.find();
@@ -240,6 +241,7 @@ module.exports = {
     });
     console.log("usao sam");
   },
+
   getStatus: async (req, res) => {
     try {
       const itemId = req.params.itemId;
