@@ -228,8 +228,6 @@ module.exports = {
 
         await user.save();
       });
-
-      console.log("Status updated successfully");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -239,7 +237,6 @@ module.exports = {
     statusUpdateJob = schedule.scheduleJob("*/10 * * * * *", () => {
       module.exports.updateStatus();
     });
-    console.log("usao sam");
   },
 
   getStatus: async (req, res) => {
@@ -270,7 +267,6 @@ module.exports = {
       if (!itemStatus) {
         return res.status(404).json({ message: "Stavka nije pronađena" });
       }
-      console.log(itemStatus);
       res.status(200).json({ status: itemStatus });
     } catch (error) {
       console.error("Greška pri dobijanju statusa narudžbe:", error);
