@@ -200,7 +200,7 @@ module.exports = {
         user.products.forEach(async (productEntry) => {
           const currentDate = new Date();
           const purchaseDate = new Date(productEntry.date);
-          const twoDaysInMillis = 10 * 1000; //2 * 24 * 60 * 60 * 1000
+          const twoDaysInMillis = 2 * 24 * 60 * 60 * 1000;
           const nextStatusUpdateDate = new Date(
             purchaseDate.getTime() + twoDaysInMillis
           );
@@ -234,7 +234,7 @@ module.exports = {
   },
 
   func: async (req, res) => {
-    statusUpdateJob = schedule.scheduleJob("*/10 * * * * *", () => {
+    const statusUpdateJob = schedule.scheduleJob("0 0 */2 * * *", () => {
       module.exports.updateStatus();
     });
   },
