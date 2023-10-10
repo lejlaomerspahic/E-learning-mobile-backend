@@ -208,7 +208,6 @@ module.exports = {
           const statusOptions = [
             "Narudžba primljena",
             "Narudžba poslata",
-            "Narudžba u tranzitu",
             "Narudžba stigla na odredište",
             "Narudžba u procesu dostave",
             "Narudžba isporučena",

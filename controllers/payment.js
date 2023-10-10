@@ -8,7 +8,7 @@ module.exports = {
     try {
       const paymentIntent = await stripe.paymentIntents.create({
         amount: req.body.price * 100,
-        currency: "usd",
+        currency: "bam",
         payment_method_types: ["card"],
       });
 
